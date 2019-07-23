@@ -15,7 +15,7 @@ CREATE TABLE properties (
   id SERIAL PRIMARY KEY,
   owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
-  description VARCHAR(500) NOT NULL,
+  description VARCHAR(90000) NOT NULL,
   thumbnail_photo_url VARCHAR(255) NOT NULL,
   cover_photo_url VARCHAR(255) NOT NULL,
   cost_per_night MONEY NOT NULL,
@@ -25,8 +25,8 @@ CREATE TABLE properties (
   country VARCHAR(255) NOT NULL,
   street VARCHAR(255) NOT NULL,
   city VARCHAR(255) NOT NULL,
-  province VARCHAR(255) NOT NULL,
-  postal_code VARCHAR(255) NOT NULL,
+  provence VARCHAR(255) NOT NULL,
+  post_code VARCHAR(255) NOT NULL,
   active BOOLEAN NOT NULL
 );
 
