@@ -30,7 +30,7 @@ CREATE TABLE properties (
   city VARCHAR(255) NOT NULL,
   provence VARCHAR(255) NOT NULL,
   post_code VARCHAR(255) NOT NULL,
-  active BOOLEAN NOT NULL
+  active BOOLEAN DEFAULT TRUE
 );
 
 -- Reservations Table

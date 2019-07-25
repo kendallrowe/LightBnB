@@ -1,6 +1,3 @@
-const properties = require('./json/properties.json');
-const users = require('./json/users.json');
-
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -29,10 +26,6 @@ const getUserWithEmail = function(email) {
       return res.rows[0];
     }
     return null;
-  })
-  .catch(err => {
-    console.error('query error', err.stack);
-    return false;
   });
 }
 exports.getUserWithEmail = getUserWithEmail;
@@ -53,10 +46,6 @@ const getUserWithId = function(id) {
       return res.rows[0];
     }
     return null;
-  })
-  .catch(err => {
-    console.error('query error', err.stack);
-    return false;
   });
 }
 exports.getUserWithId = getUserWithId;
@@ -73,12 +62,7 @@ const addUser =  function(user) {
     INSERT INTO users (name, email, password) 
     VALUES ($1, $2, $3) RETURNING *;
   `, [user.name, user.email, user.password])
-  .then((results) => {
-    return results.rows})
-  .catch(err => {
-    console.error('query error', err.stack);
-    return false;
-  });
+  .then((results) => results.rows);
 }
 exports.addUser = addUser;
 
@@ -102,11 +86,7 @@ const getAllReservations = function(guest_id, limit = 10) {
     ORDER BY reservations.start_date
     LIMIT $2;
   `, [guest_id, limit])
-  .then(res => res.rows)
-  .catch(err => {
-    console.error('query error', err.stack);
-    return false;
-  });;
+  .then(res => res.rows);
 }
 exports.getAllReservations = getAllReservations;
 
@@ -120,7 +100,7 @@ exports.getAllReservations = getAllReservations;
  */
 
 const checkOption = function(query, option, optionalQueryString) {
-  if (option) {
+  if (option && option !== "%undefined%") {
     query.params.push(`${option}`);
     query.queryString += optionalQueryString;
   }
@@ -145,7 +125,7 @@ const getAllProperties = function(options, limit = 10) {
   `;
 
   query = checkOption(query, `%${options.city}%`, `${query.whereAnd} city LIKE $${query.params.length + 1}`);
-
+  
   query = checkOption(query, options.owner_id, `${query.whereAnd} owner_id = $${query.params.length + 1} `);
   
   query = checkOption(query, options.minimum_price_per_night, `${query.whereAnd} cost_per_night >= $${query.params.length + 1} `);
@@ -167,15 +147,9 @@ const getAllProperties = function(options, limit = 10) {
   LIMIT $${query.params.length};
   `;
 
-  console.log(query.queryString);
-
   return pool.query(query.queryString, query.params)
   .then(res => {
     return res.rows
-  })
-  .catch(err => {
-    console.error('query error', err.stack);
-    return false;
   });
 }
 exports.getAllProperties = getAllProperties;
@@ -187,9 +161,20 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function(property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+  const queryParams = [];
+  const queryKeys = [];
+  console.log(this);
+  for (attribute in property) {
+    queryKeys.push(attribute);
+    queryParams.push(property[attribute]);
+  }
+
+  return pool.query(`
+    INSERT INTO properties (${queryKeys[0]}, ${queryKeys[1]}, ${queryKeys[2]}, ${queryKeys[3]}, ${queryKeys[4]}, ${queryKeys[5]}, ${queryKeys[6]}, ${queryKeys[7]}, ${queryKeys[8]}, ${queryKeys[9]}, ${queryKeys[10]}, ${queryKeys[11]}, ${queryKeys[12]}, ${queryKeys[13]})
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    RETURNING *;
+  `, queryParams)
+  .then(res => res.rows[0]);
+  
 }
 exports.addProperty = addProperty;
